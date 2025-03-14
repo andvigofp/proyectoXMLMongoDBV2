@@ -6,7 +6,8 @@ db.Usuarios.insertMany([
         "correo": "juan.perez@example.com",
         "contrasena": "hashed_password1",
         "direccion": "Calle Falsa 123, Ciudad, País",
-        "telefono": "123-456-7890"
+        "telefono": "123-456-7890",
+        "edad": 15
     },
     {
         "usuario_id": 2,
@@ -14,7 +15,8 @@ db.Usuarios.insertMany([
         "correo": "maria.garcia@example.com",
         "contrasena": "hashed_password2",
         "direccion": "Avenida Siempre Viva 742, Ciudad, País",
-        "telefono": "098-765-4321"
+        "telefono": "098-765-4321",
+        "edad": 20
     },
     {
         "usuario_id": 3,
@@ -22,7 +24,8 @@ db.Usuarios.insertMany([
         "correo": "carlos.lopez@example.com",
         "contrasena": "hashed_password3",
         "direccion": "Plaza Mayor 1, Ciudad, País",
-        "telefono": "111-222-3333"
+        "telefono": "111-222-3333",
+        "edad": 18
     },
     {
         "usuario_id": 4,
@@ -30,7 +33,8 @@ db.Usuarios.insertMany([
         "correo": "ana.fernandez@example.com",
         "contrasena": "hashed_password4",
         "direccion": "Calle del Pez 23, Ciudad, País",
-        "telefono": "444-555-6666"
+        "telefono": "444-555-6666",
+        "edad": 25
     },
     {
         "usuario_id": 5,
@@ -38,7 +42,8 @@ db.Usuarios.insertMany([
         "correo": "luis.martinez@example.com",
         "contrasena": "hashed_password5",
         "direccion": "Gran Vía 100, Ciudad, País",
-        "telefono": "777-888-9999"
+        "telefono": "777-888-9999".
+        "edad": 30
     }
 ]);
 

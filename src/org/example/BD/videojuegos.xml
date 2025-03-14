@@ -1,0 +1,243 @@
+<videojuegos>
+<videojuego>
+<id>1</id>
+<titulo>The Legend of Zelda: Breath of the Wild</titulo>
+<descripcion>Aventura épica en un mundo abierto donde Link debe explorar el vasto reino de Hyrule, resolver acertijos, mejorar su equipo y enfrentarse a Ganon para salvar a la princesa Zelda.</descripcion>
+<precio>59.99</precio>
+<disponibilidad>5</disponibilidad>
+<genero>Aventura</genero>
+<desarrollador>Nintendo</desarrollador>
+<edad_minima_recomendada>12</edad_minima_recomendada>
+<plataforma>Nintendo Switch</plataforma>
+<especificaciones>
+<mundo_abierto>Sí</mundo_abierto>
+<duracion_promedio>50 horas</duracion_promedio>
+<cartucho>Sí</cartucho>
+<modo_portatil>Compatible</modo_portatil>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>2</id>
+<titulo>God of War Ragnarok</titulo>
+<descripcion>Kratos y Atreus viajan por los Nueve Reinos en una aventura llena de acción, mitología y drama. Se enfrentan a dioses nórdicos como Thor y Odín en su intento por desafiar el destino.</descripcion>
+<precio>69.99</precio>
+<disponibilidad>15</disponibilidad>
+<genero>Acción</genero>
+<desarrollador>Santa Monica Studio</desarrollador>
+<edad_minima_recomendada>18</edad_minima_recomendada>
+<plataforma>PlayStation 5</plataforma>
+<especificaciones>
+<modo_historia>Sí</modo_historia>
+<resolucion_maxima>4K</resolucion_maxima>
+<fps>60</fps>
+<audio_3d>Compatible</audio_3d>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>3</id>
+<titulo>Cyberpunk 2077</titulo>
+<descripcion>Un RPG de mundo abierto ambientado en un futuro distópico donde los jugadores encarnan a V, un mercenario en busca de la inmortalidad en la peligrosa ciudad de Night City.</descripcion>
+<precio>49.99</precio>
+<disponibilidad>30</disponibilidad>
+<genero>RPG</genero>
+<desarrollador>CD Projekt Red</desarrollador>
+<edad_minima_recomendada>18</edad_minima_recomendada>
+<plataforma>PC</plataforma>
+<especificaciones>
+<graficos>Ultra</graficos>
+<ray_tracing>Disponible</ray_tracing>
+<cpu_recomendada>Intel i7-12700K</cpu_recomendada>
+<gpu_recomendada>RTX 3080</gpu_recomendada>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>4</id>
+<titulo>EA Sports FC 25</titulo>
+<descripcion>El simulador de fútbol más realista hasta la fecha, con mejoras en la inteligencia artificial, animaciones más fluidas y nuevos modos de juego para desafiar a los mejores jugadores del mundo.</descripcion>
+<precio>69.99</precio>
+<disponibilidad>100</disponibilidad>
+<genero>Deportes</genero>
+<desarrollador>EA Sports</desarrollador>
+<edad_minima_recomendada>3</edad_minima_recomendada>
+<plataforma>PlayStation 5</plataforma>
+<especificaciones>
+<modo_carrera>Sí</modo_carrera>
+<modo_online>Sí</modo_online>
+<fps>60</fps>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>5</id>
+<titulo>Hollow Knight</titulo>
+<descripcion>Explora el misterioso reino de Hallownest en este desafiante metroidvania. Con su arte dibujado a mano y su mecánica precisa de combate, es un juego que pondrá a prueba tu habilidad.</descripcion>
+<precio>14.99</precio>
+<disponibilidad>11</disponibilidad>
+<genero>Plataformas</genero>
+<desarrollador>Team Cherry</desarrollador>
+<edad_minima_recomendada>7</edad_minima_recomendada>
+<plataforma>Nintendo Switch</plataforma>
+<especificaciones>
+<modo_portatil>Compatible</modo_portatil>
+<duracion_promedio>40 horas</duracion_promedio>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>6</id>
+<titulo>Spider-Man 2</titulo>
+<descripcion>Acompaña a Peter Parker y Miles Morales en su lucha contra Venom en este trepidante juego de mundo abierto con gráficos mejorados y una historia cautivadora.</descripcion>
+<precio>79.99</precio>
+<disponibilidad>20</disponibilidad>
+<genero>Acción</genero>
+<desarrollador>Insomniac Games</desarrollador>
+<edad_minima_recomendada>16</edad_minima_recomendada>
+<plataforma>PlayStation 5</plataforma>
+<especificaciones>
+<graficos>Ultra</graficos>
+<fps>60</fps>
+<mundo_abierto>Sí</mundo_abierto>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>7</id>
+<titulo>Red Dead Redemption 2</titulo>
+<descripcion>Una épica historia de forajidos en el salvaje oeste, donde Arthur Morgan debe elegir entre la lealtad a su banda o su propia moralidad mientras enfrenta un mundo cambiante.</descripcion>
+<precio>39.99</precio>
+<disponibilidad>18</disponibilidad>
+<genero>Aventura</genero>
+<desarrollador>Rockstar Games</desarrollador>
+<edad_minima_recomendada>18</edad_minima_recomendada>
+<plataforma>PC</plataforma>
+<especificaciones>
+<graficos>Ultra</graficos>
+<mundo_abierto>Sí</mundo_abierto>
+<ray_tracing>No</ray_tracing>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>8</id>
+<titulo>Elden Ring</titulo>
+<descripcion>Un desafiante RPG de acción con un vasto mundo abierto diseñado por Hidetaka Miyazaki y George R.R. Martin. Explora reinos oscuros y derrota temibles enemigos en este aclamado juego de FromSoftware.</descripcion>
+<precio>59.99</precio>
+<disponibilidad>10</disponibilidad>
+<genero>RPG</genero>
+<desarrollador>FromSoftware</desarrollador>
+<edad_minima_recomendada>16</edad_minima_recomendada>
+<plataforma>PC</plataforma>
+<especificaciones>
+<modo_online>Sí</modo_online>
+<ray_tracing>Disponible</ray_tracing>
+<fps>60</fps>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>9</id>
+<titulo>Minecraft</titulo>
+<descripcion>Explora, construye y sobrevive en un mundo generado proceduralmente. Usa tu creatividad para crear estructuras asombrosas o aventúrate en el modo supervivencia.</descripcion>
+<precio>29.99</precio>
+<disponibilidad>11</disponibilidad>
+<genero>Sandbox</genero>
+<desarrollador>Mojang Studios</desarrollador>
+<edad_minima_recomendada>7</edad_minima_recomendada>
+<plataforma>PC</plataforma>
+<especificaciones>
+<modo_creativo>Sí</modo_creativo>
+<modo_supervivencia>Sí</modo_supervivencia>
+<multijugador>Online y local</multijugador>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>10</id>
+<titulo>Resident Evil 4 Remake</titulo>
+<descripcion>Revive la icónica historia de Leon S. Kennedy en este remake con gráficos mejorados y mecánicas renovadas. Sobrevive en un pueblo infectado por un peligroso virus.</descripcion>
+<precio>59.99</precio>
+<disponibilidad>4</disponibilidad>
+<genero>Terror</genero>
+<desarrollador>Capcom</desarrollador>
+<edad_minima_recomendada>18</edad_minima_recomendada>
+<plataforma>PlayStation 5</plataforma>
+<especificaciones>
+<modo_historia>Sí</modo_historia>
+<graficos>4K</graficos>
+<fps>60</fps>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>11</id>
+<titulo>Super Mario Odyssey</titulo>
+<descripcion>Embárcate en una aventura junto a Mario y su compañero Cappy para rescatar a la princesa Peach y explorar vastos mundos llenos de secretos y desafíos.</descripcion>
+<precio>49.99</precio>
+<disponibilidad>7</disponibilidad>
+<genero>Plataformas</genero>
+<desarrollador>Nintendo</desarrollador>
+<edad_minima_recomendada>3</edad_minima_recomendada>
+<plataforma>Nintendo Switch</plataforma>
+<especificaciones>
+<modo_portatil>Compatible</modo_portatil>
+<multijugador>Local</multijugador>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>12</id>
+<titulo>Horizon Forbidden West</titulo>
+<descripcion>Acompaña a Aloy en su nueva aventura por tierras inexploradas en busca de respuestas sobre el destino de la humanidad, enfrentándose a máquinas letales.</descripcion>
+<precio>69.99</precio>
+<disponibilidad>2</disponibilidad>
+<genero>Aventura</genero>
+<desarrollador>Guerrilla Games</desarrollador>
+<edad_minima_recomendada>16</edad_minima_recomendada>
+<plataforma>PlayStation 5</plataforma>
+<especificaciones>
+<modo_historia>Sí</modo_historia>
+<graficos>4K</graficos>
+<mundo_abierto>Sí</mundo_abierto>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>13</id>
+<titulo>Grand Theft Auto V</titulo>
+<descripcion>Conviértete en un criminal de Los Santos en este juego de mundo abierto, con una historia envolvente y un modo multijugador expansivo con constantes actualizaciones.</descripcion>
+<precio>29.99</precio>
+<disponibilidad>5</disponibilidad>
+<genero>Acción</genero>
+<desarrollador>Rockstar Games</desarrollador>
+<edad_minima_recomendada>18</edad_minima_recomendada>
+<plataforma>PC</plataforma>
+<especificaciones>
+<modo_historia>Sí</modo_historia>
+<modo_online>Sí</modo_online>
+<fps>60</fps>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>14</id>
+<titulo>Starfield</titulo>
+<descripcion>Explora el universo en este RPG de ciencia ficción de Bethesda. Viaja entre planetas, construye tu nave y descubre los secretos de la galaxia en una aventura épica.</descripcion>
+<precio>69.99</precio>
+<disponibilidad>25</disponibilidad>
+<genero>RPG</genero>
+<desarrollador>Bethesda Game Studios</desarrollador>
+<edad_minima_recomendada>18</edad_minima_recomendada>
+<plataforma>Xbox Series X</plataforma>
+<especificaciones>
+<mundo_abierto>Sí</mundo_abierto>
+<naves_personalizables>Sí</naves_personalizables>
+<fps>60</fps>
+</especificaciones>
+</videojuego>
+<videojuego>
+<id>15</id>
+<titulo>Metroid Dread</titulo>
+<descripcion>Samus Aran regresa en esta nueva entrega de la saga Metroid, enfrentándose a peligrosos enemigos y explorando laberintos llenos de secretos en un mundo alienígena.</descripcion>
+<precio>49.99</precio>
+<disponibilidad>20</disponibilidad>
+<genero>Acción</genero>
+<desarrollador>MercurySteam</desarrollador>
+<edad_minima_recomendada>12</edad_minima_recomendada>
+<plataforma>Nintendo Switch</plataforma>
+<especificaciones>
+<modo_portatil>Compatible</modo_portatil>
+<dificultad>Alta</dificultad>
+<fps>60</fps>
+</especificaciones>
+</videojuego>
+</videojuegos>

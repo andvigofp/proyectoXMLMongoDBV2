@@ -26,6 +26,7 @@ public class MetodosMongoDB {
     private static ConexionMongoDB conexionMongoDB = new ConexionMongoDB();
     private static MongoDatabase database = conexionMongoDB.conexionMongoDB();
     private static ObjectId usuarioIdActual = null;
+    private static Integer usuarioIdIntegerActual = null;
     private static String usuarioEmailActual = null;
 
 
@@ -49,6 +50,8 @@ public class MetodosMongoDB {
             String direccion = teclado.nextLine();
             System.out.print("Introduce el teléfono del usuario: ");
             String telefono = teclado.nextLine();
+            System.out.print("Introduce la edad del usuario: ");
+            int edad = teclado.nextInt();
 
             // Encontrar el último usuario_id y asignar el siguiente usuario_id
             Document ultimoUsuario = usuariosCollection.find().sort(Sorts.descending("usuario_id")).first();
@@ -59,7 +62,9 @@ public class MetodosMongoDB {
                     .append("correo", correo)
                     .append("contrasena", contrasena)
                     .append("direccion", direccion)
-                    .append("telefono", telefono);
+                    .append("telefono", telefono)
+                    .append("edad", edad);
+
 
             usuariosCollection.insertOne(nuevoUsuario);
             System.out.println("Usuario creado exitosamente con usuario_id: " + nuevoUsuarioId);
@@ -73,6 +78,7 @@ public class MetodosMongoDB {
                 System.out.println("Correo: " + usuarioCreado.getString("correo"));
                 System.out.println("Dirección: " + usuarioCreado.getString("direccion"));
                 System.out.println("Teléfono: " + usuarioCreado.getString("telefono"));
+                System.out.println("Teléfono: " + usuarioCreado.getInteger("edad"));
             }
         } catch (Exception e) {
             System.out.println("Error al crear el usuario: " + e.getMessage());
@@ -92,8 +98,8 @@ public class MetodosMongoDB {
             if (usuario != null) {
                 usuarioEmailActual = correo;
                 usuarioIdActual = usuario.getObjectId("_id");
-                int usuarioId = usuario.getInteger("usuario_id");
-                System.out.println("Usuario identificado exitosamente. ID del usuario: " + usuarioId);
+                usuarioIdIntegerActual = usuario.getInteger("usuario_id");
+                System.out.println("Usuario identificado exitosamente. ID del usuario: " + usuarioIdIntegerActual);
             } else {
                 System.out.println("Error: No se encontró un usuario con ese correo.");
             }
@@ -102,6 +108,7 @@ public class MetodosMongoDB {
             e.printStackTrace();
         }
     }
+
 
     //Método para borrar el usuario de la base de datos
     public void borrarUsuario(Scanner teclado) {
@@ -218,13 +225,20 @@ public class MetodosMongoDB {
 
     //Método para ñadir videojuegos al carrito
     public void anadirVideojuegoAlCarrito(Scanner teclado) {
+        // Si el usuario no está identificado, intentar identificarlo
+        if (usuarioIdIntegerActual == null) {
+            identificarUsuarioPorEmail(teclado);
+            if (usuarioIdIntegerActual == null) {
+                System.out.println("Error: No se ha identificado ningún usuario. No se puede proceder.");
+                return; // Si el usuario sigue sin identificarse, salir del método
+            }
+        }
+
         MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
 
         while (true) {
-            // Mostrar los videojuegos disponibles según la edad mínima recomendada del usuario actual
-            mostrarVideojuegosPorEdad();
+            mostrarVideojuegosPorEdad(teclado);
 
-            // Pedir el id del videojuego y la cantidad a añadir al carrito
             System.out.print("Introduce el ID del videojuego a añadir al carrito: ");
             int idVideojuego = teclado.nextInt();
             System.out.print("Introduce la cantidad a añadir al carrito: ");
@@ -232,8 +246,7 @@ public class MetodosMongoDB {
             teclado.nextLine(); // Limpiar el buffer
 
             try {
-                // Añadir el videojuego al carrito del usuario
-                Document nuevoItemCarrito = new Document("usuario_id", usuarioIdActual)
+                Document nuevoItemCarrito = new Document("usuario_id", usuarioIdIntegerActual)
                         .append("videojuego_id", idVideojuego)
                         .append("cantidad", cantidad);
 
@@ -245,7 +258,6 @@ public class MetodosMongoDB {
                 e.printStackTrace();
             }
 
-            // Preguntar si se desea seguir añadiendo videojuegos
             System.out.print("¿Deseas seguir añadiendo videojuegos al carrito? (s/n): ");
             String respuesta = teclado.nextLine();
             if (!respuesta.equalsIgnoreCase("s")) {
@@ -253,6 +265,9 @@ public class MetodosMongoDB {
             }
         }
     }
+
+
+
 
     public void mostrarTodosLosUsuarios() {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
@@ -262,10 +277,17 @@ public class MetodosMongoDB {
     }
 
 
-    public void mostrarVideojuegosPorEdad() {
-        // Obtener la edad del usuario actual desde MongoDB utilizando usuario_id
+    public void mostrarVideojuegosPorEdad(Scanner teclado) {
+        if (usuarioIdIntegerActual == null) {
+            System.out.println("Error: No se ha identificado ningún usuario.");
+            identificarUsuarioPorEmail(teclado);
+            if (usuarioIdIntegerActual == null) {
+                return; // Si el usuario sigue sin identificarse, salir del método
+            }
+        }
+
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
-        Document usuario = usuariosCollection.find(Filters.eq("usuario_id", usuarioIdActual)).first();
+        Document usuario = usuariosCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
 
         if (usuario == null) {
             System.out.println("Error: No se encontró un usuario con el ID proporcionado.");
@@ -279,12 +301,10 @@ public class MetodosMongoDB {
             return;
         }
 
-        // Obtener la conexión activa desde conexionBasex
         BaseXClient session = conexionBasex.conexionBaseX();
 
         if (session != null) {
             try {
-                // Comando XQuery para obtener los videojuegos cuya edad mínima recomendada sea inferior o igual a la del usuario
                 String consulta = String.format("""
             for $v in //videojuego
             where number($v/edad_minima_recomendada) <= %d
@@ -306,13 +326,11 @@ public class MetodosMongoDB {
 
                 while (query.more()) {
                     String resultado = query.next();
-                    // Parsear el resultado y agregar a la lista de videojuegos disponibles
                     Videojuego videojuego = parsearVideojuego(resultado);
                     videojuegosDisponibles.add(videojuego);
                 }
                 query.close();
 
-                // Mostrar los resultados
                 if (!videojuegosDisponibles.isEmpty()) {
                     System.out.println("Videojuegos disponibles según la edad mínima recomendada:");
                     for (Videojuego videojuego : videojuegosDisponibles) {
@@ -326,7 +344,6 @@ public class MetodosMongoDB {
                 System.out.println("Error al listar los videojuegos por edad mínima recomendada.");
                 e.printStackTrace();
             } finally {
-                // Cerrar la conexión
                 try {
                     session.close();
                 } catch (IOException e) {
@@ -338,10 +355,6 @@ public class MetodosMongoDB {
             System.out.println("Error: No se pudo establecer la conexión con la base de datos.");
         }
     }
-
-
-
-
 
 
     // Método para consultar videojuegos disponibles desde MongoDB

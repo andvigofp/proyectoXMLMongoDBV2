@@ -78,7 +78,7 @@ public class MetodosMongoDB {
                 System.out.println("Correo: " + usuarioCreado.getString("correo"));
                 System.out.println("Dirección: " + usuarioCreado.getString("direccion"));
                 System.out.println("Teléfono: " + usuarioCreado.getString("telefono"));
-                System.out.println("Teléfono: " + usuarioCreado.getInteger("edad"));
+                System.out.println("Edad: " + usuarioCreado.getInteger("edad"));
             }
         } catch (Exception e) {
             System.out.println("Error al crear el usuario: " + e.getMessage());
@@ -109,10 +109,16 @@ public class MetodosMongoDB {
         }
     }
 
-
     //Método para borrar el usuario de la base de datos
     public void borrarUsuario(Scanner teclado) {
-        int usuarioId = introducirInt(teclado, "Introduce el ID del usuario a borrar");
+        // Identificar el usuario primero
+        identificarUsuarioPorEmail(teclado);
+
+        // Si no se identificó al usuario, finalizar el método
+        if (usuarioIdIntegerActual == null) {
+            System.out.println("Error: No se ha identificado ningún usuario.");
+            return;
+        }
 
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
         MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
@@ -120,29 +126,37 @@ public class MetodosMongoDB {
 
         try {
             // Buscar el usuario en la colección Usuarios
-            Document usuario = usuariosCollection.find(Filters.eq("usuario_id", usuarioId)).first();
+            Document usuario = usuariosCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
             if (usuario != null) {
                 System.out.println("Usuario encontrado: " + usuario.toJson());
 
+                // Confirmación antes de borrar
+                System.out.print("¿Estás seguro de que deseas borrar este usuario y sus datos asociados? (s/n): ");
+                String respuesta = teclado.nextLine();
+                if (!respuesta.equalsIgnoreCase("s")) {
+                    System.out.println("Operación cancelada.");
+                    return;
+                }
+
                 // Borrar el usuario de la colección Usuarios
-                usuariosCollection.deleteOne(Filters.eq("usuario_id", usuarioId));
+                usuariosCollection.deleteOne(Filters.eq("usuario_id", usuarioIdIntegerActual));
                 System.out.println("Usuario borrado de la colección Usuarios");
 
                 // Borrar el carrito asociado en la colección Carrito
-                carritoCollection.deleteMany(Filters.eq("usuario_id", usuarioId));
+                carritoCollection.deleteMany(Filters.eq("usuario_id", usuarioIdIntegerActual));
                 System.out.println("Carritos asociados borrados de la colección Carrito");
 
                 // Borrar las compras asociadas en la colección Compras
-                comprasCollection.deleteMany(Filters.eq("usuario_id", usuarioId));
+                comprasCollection.deleteMany(Filters.eq("usuario_id", usuarioIdIntegerActual));
                 System.out.println("Compras asociadas borradas de la colección Compras");
 
                 System.out.println("Usuario y datos asociados borrados exitosamente.");
 
-                // Comprobación de coincidencia del ObjectId
-                ObjectId usuarioObjectId = usuario.getObjectId("_id");
-                if (usuarioObjectId.equals(usuarioIdActual)) {
+                // Restablecer la identificación del usuario si coincide
+                if (usuarioIdActual != null && usuarioIdActual.equals(usuario.getObjectId("_id"))) {
                     usuarioEmailActual = null;
                     usuarioIdActual = null;
+                    usuarioIdIntegerActual = null;
                 }
             } else {
                 System.out.println("Error: No se encontró un usuario con ese ID.");
@@ -155,31 +169,52 @@ public class MetodosMongoDB {
 
     //Método para modificar el campo del usuario
     public void modificarCampoUsuario(Scanner teclado) {
-        // Pedir el ID del usuario
-        int usuarioId = introducirInt(teclado,"Introduce el ID del usuario a modificar");
-        teclado.nextLine(); // Limpiar el buffer
+        // Identificar al usuario primero
+        identificarUsuarioPorEmail(teclado);
+
+        // Si no se identificó al usuario, finalizar el método
+        if (usuarioIdIntegerActual == null) {
+            System.out.println("Error: No se ha identificado ningún usuario. No se puede proceder.");
+            return;
+        }
 
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
 
         // Pedir el campo a modificar y el nuevo valor
-        String campo = introducirString(teclado,"Introduce el campo a modificar (nombre, contrasena, direccion, telefono): ");
-        String nuevoValor = introducirString(teclado,"Introduce el nuevo valor para " + campo + ": ");
+        String campo = introducirString(teclado, "Introduce el campo a modificar (nombre, contrasena, direccion, telefono, edad): ");
+        String nuevoValor = introducirString(teclado, "Introduce el nuevo valor para " + campo + ": ");
 
         try {
-            // Validar que el campo no esté vacío
+            // Validar que el campo y el valor no estén vacíos
             if (campo.isEmpty() || nuevoValor.isEmpty()) {
                 throw new IllegalArgumentException("El campo y el valor no pueden estar vacíos.");
             }
 
+            // Preparar el documento de actualización
+            Document actualizacion;
+
+            // Si el campo a modificar es "edad", validar y convertir el valor a Integer
+            if (campo.equalsIgnoreCase("edad")) {
+                try {
+                    int nuevoValorEntero = Integer.parseInt(nuevoValor); // Convertir a Integer
+                    actualizacion = new Document("$set", new Document(campo, nuevoValorEntero));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("El valor para el campo 'edad' debe ser un número entero válido.");
+                }
+            } else {
+                // Para otros campos, usar el valor tal cual
+                actualizacion = new Document("$set", new Document(campo, nuevoValor));
+            }
+
             // Actualizar el campo en la colección Usuarios
             usuariosCollection.updateOne(
-                    Filters.eq("usuario_id", usuarioId),
-                    new Document("$set", new Document(campo, nuevoValor))
+                    Filters.eq("usuario_id", usuarioIdIntegerActual),
+                    actualizacion
             );
             System.out.println("Campo modificado exitosamente.");
 
             // Mostrar la información del usuario después de la modificación
-            Document usuarioModificado = usuariosCollection.find(Filters.eq("usuario_id", usuarioId)).first();
+            Document usuarioModificado = usuariosCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
             if (usuarioModificado != null) {
                 System.out.println("Información del usuario modificado:");
                 System.out.println("ID: " + usuarioModificado.getInteger("usuario_id"));
@@ -187,6 +222,7 @@ public class MetodosMongoDB {
                 System.out.println("Correo: " + usuarioModificado.getString("correo"));
                 System.out.println("Dirección: " + usuarioModificado.getString("direccion"));
                 System.out.println("Teléfono: " + usuarioModificado.getString("telefono"));
+                System.out.println("Edad: " + usuarioModificado.getInteger("edad"));
             }
 
         } catch (IllegalArgumentException e) {
@@ -196,6 +232,8 @@ public class MetodosMongoDB {
             e.printStackTrace();
         }
     }
+
+
 
     private static int obtenerUltimoUsuarioId() {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");

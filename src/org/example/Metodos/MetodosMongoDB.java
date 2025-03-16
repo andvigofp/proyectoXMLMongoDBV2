@@ -10,6 +10,8 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.example.ConexionBaseX.ConexionBaseX;
 import org.example.ConexionMongoDB.ConexionMongoDB;
+import org.example.Modelo.CarritoCoste;
+import org.example.Modelo.UsuarioGasto;
 import org.example.Modelo.Videojuego;
 import org.xml.sax.InputSource;
 
@@ -17,9 +19,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MetodosMongoDB {
     private static ConexionBaseX conexionBasex = new ConexionBaseX();
@@ -305,8 +308,6 @@ public class MetodosMongoDB {
     }
 
 
-
-
     public void mostrarTodosLosUsuarios() {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
         for (Document usuario : usuariosCollection.find()) {
@@ -442,6 +443,292 @@ public class MetodosMongoDB {
             e.printStackTrace();
         }
         return null;
+    }
+
+    //Método para mostrar el carrito y coste total
+    public void mostrarCarritoUsuario(Scanner teclado) {
+        // Identificar al usuario primero
+        identificarUsuarioPorEmail(teclado);
+
+        // Si no se identificó al usuario, finalizar el método
+        if (usuarioIdIntegerActual == null) {
+            System.out.println("Error: No se ha identificado ningún usuario. No se puede proceder.");
+            return;
+        }
+
+        MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
+
+        // Buscar el carrito del usuario identificado
+        Document carrito = carritoCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
+        if (carrito == null) {
+            System.out.println("No se encontró un carrito para el usuario identificado.");
+            return;
+        }
+
+        List<Document> videojuegosEnCarrito = (List<Document>) carrito.get("videojuegos");
+
+        double costeTotal = 0;
+
+        // Mostrar datos del carrito
+        System.out.println("Carrito del usuario:");
+        for (Document videojuego : videojuegosEnCarrito) {
+            int videojuegoId = videojuego.getInteger("videojuego_id");
+            String titulo = videojuego.getString("titulo");
+            int cantidad = videojuego.getInteger("cantidad");
+            double precio = videojuego.getDouble("precio");
+
+            costeTotal += precio * cantidad;
+
+            System.out.println("ID del videojuego: " + videojuegoId);
+            System.out.println("Título: " + titulo);
+            System.out.println("Cantidad: " + cantidad);
+            System.out.println("Precio: " + precio);
+            System.out.println("Subtotal: " + (precio * cantidad));
+            System.out.println();
+        }
+
+        // Mostrar coste total
+        System.out.println("Coste total del carrito: " + costeTotal);
+    }
+
+    //Método para Comprar el carrito del usuario
+    public void comprarCarritoUsuario(Scanner teclado) {
+        // Identificar al usuario primero
+        identificarUsuarioPorEmail(teclado);
+
+        // Validar si se identificó al usuario
+        if (usuarioIdIntegerActual == null) {
+            System.out.println("Error: No se ha identificado ningún usuario. No se puede proceder.");
+            return;
+        }
+
+        MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
+        MongoCollection<Document> comprasCollection = database.getCollection("Compras");
+
+        // Buscar el carrito del usuario identificado
+        Document carrito = carritoCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
+        if (carrito == null) {
+            System.out.println("No se encontró un carrito para el usuario identificado.");
+            return;
+        }
+
+        // Validar que el campo "videojuegos" exista y no sea nulo
+        List<Document> videojuegosEnCarrito = (List<Document>) carrito.get("videojuegos");
+        if (videojuegosEnCarrito == null || videojuegosEnCarrito.isEmpty()) {
+            System.out.println("El carrito del usuario está vacío o no tiene videojuegos.");
+            return;
+        }
+
+        double costeTotal = 0.0;
+
+        // Mostrar datos del carrito
+        System.out.println("Carrito del usuario:");
+        for (Document videojuego : videojuegosEnCarrito) {
+            // Validar los campos dentro de cada videojuego
+            Integer videojuegoId = videojuego.getInteger("videojuego_id", 0);
+            String titulo = videojuego.getString("titulo");
+            Integer cantidad = videojuego.getInteger("cantidad", 0);
+            Double precio = videojuego.getDouble("precio");
+
+            // Verificar si alguno de los campos requeridos es nulo
+            if (videojuegoId == null || titulo == null || cantidad == null || precio == null) {
+                System.out.println("Advertencia: Videojuego con datos incompletos encontrado. Saltando este videojuego.");
+                continue;
+            }
+
+            costeTotal += precio * cantidad;
+
+            System.out.println("ID del videojuego: " + videojuegoId);
+            System.out.println("Título: " + titulo);
+            System.out.println("Cantidad: " + cantidad);
+            System.out.println("Precio: " + precio);
+            System.out.println("Subtotal: " + (precio * cantidad));
+            System.out.println();
+        }
+
+        // Mostrar coste total
+        System.out.println("Coste total del carrito: " + costeTotal);
+
+        // Pedir confirmación para la compra
+        System.out.print("¿Deseas confirmar la compra del carrito? (s/n): ");
+        String confirmacion = teclado.nextLine().trim().toLowerCase();
+
+        if (confirmacion.equals("s")) {
+            // Generar un nuevo ID de compra
+            int nuevaCompraId = obtenerUltimoCarritoId() + 1;
+
+            // Crear un documento de compra
+            Document compra = new Document("compra_id", nuevaCompraId)
+                    .append("usuario_id", usuarioIdIntegerActual)
+                    .append("videojuegos", videojuegosEnCarrito)
+                    .append("fecha_compra", new Date())
+                    .append("total", costeTotal);
+
+            // Insertar el documento de compra en la colección Compras
+            comprasCollection.insertOne(compra);
+
+            // Eliminar el carrito del usuario
+            carritoCollection.deleteOne(Filters.eq("usuario_id", usuarioIdIntegerActual));
+
+            System.out.println("Compra realizada exitosamente. El carrito ha sido vaciado.");
+        } else {
+            System.out.println("Compra cancelada.");
+        }
+    }
+
+
+
+    //Método para mostrar compras del usuario
+    public void mostrarComprasUsuario(Scanner teclado) {
+        // Identificar al usuario primero
+        identificarUsuarioPorEmail(teclado);
+
+        // Si no se identificó al usuario, finalizar el método
+        if (usuarioIdIntegerActual == null) {
+            System.out.println("Error: No se ha identificado ningún usuario. No se puede proceder.");
+            return;
+        }
+
+        MongoCollection<Document> comprasCollection = database.getCollection("Compras");
+
+        // Buscar las compras del usuario identificado
+        List<Document> comprasUsuario = comprasCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).into(new ArrayList<>());
+
+        if (comprasUsuario.isEmpty()) {
+            System.out.println("No se encontraron compras para el usuario identificado.");
+            return;
+        }
+
+        // Mostrar datos de las compras
+        System.out.println("Compras del usuario:");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        for (Document compra : comprasUsuario) {
+            int compraId = compra.getInteger("compra_id");
+            Object fechaCompraObj = compra.get("fecha_compra");
+            Date fechaCompra = null;
+
+            if (fechaCompraObj instanceof String) {
+                try {
+                    fechaCompra = dateFormat.parse((String) fechaCompraObj);
+                } catch (ParseException e) {
+                    System.out.println("Error al convertir la fecha de compra: " + e.getMessage());
+                }
+            } else if (fechaCompraObj instanceof Date) {
+                fechaCompra = (Date) fechaCompraObj;
+            }
+
+            double total = compra.getDouble("total");
+            List<Document> videojuegos = (List<Document>) compra.get("videojuegos");
+
+            System.out.println("ID de la compra: " + compraId);
+            System.out.println("Fecha de la compra: " + fechaCompra);
+            System.out.println("Total: " + total);
+
+            // Mostrar datos de los videojuegos en la compra
+            for (Document videojuego : videojuegos) {
+                int videojuegoId = videojuego.getInteger("videojuego_id");
+                String titulo = videojuego.getString("titulo");
+                int cantidad = videojuego.getInteger("cantidad");
+                double precio = videojuego.getDouble("precio");
+
+                System.out.println("\tID del videojuego: " + videojuegoId);
+                System.out.println("\tTítulo: " + titulo);
+                System.out.println("\tCantidad: " + cantidad);
+                System.out.println("\tPrecio: " + precio);
+                System.out.println("\tSubtotal: " + (precio * cantidad));
+            }
+
+            System.out.println();
+        }
+    }
+
+    //Método para consultar el coste del carrito
+    public void consultaCosteCarritos() {
+        MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
+
+        // Obtener todos los carritos
+        List<Document> carritos = carritoCollection.find().into(new ArrayList<>());
+
+        // Lista para almacenar los resultados
+        List<CarritoCoste> resultados = new ArrayList<>();
+
+        // Calcular el coste total de cada carrito
+        for (Document carrito : carritos) {
+            // Validar campos necesarios en el documento
+            Integer carritoId = carrito.getInteger("carrito_id");
+            Integer usuarioId = carrito.getInteger("usuario_id");
+            List<Document> videojuegosEnCarrito = (List<Document>) carrito.get("videojuegos");
+
+            if (carritoId == null || usuarioId == null || videojuegosEnCarrito == null) {
+                System.out.println("Advertencia: Carrito con datos incompletos encontrado. Saltando este carrito.");
+                continue; // Omitir este documento
+            }
+
+            double costeTotal = 0;
+
+            for (Document videojuego : videojuegosEnCarrito) {
+                Double precio = videojuego.getDouble("precio");
+                Integer cantidad = videojuego.getInteger("cantidad");
+
+                // Validar que el videojuego contiene los datos necesarios
+                if (precio == null || cantidad == null) {
+                    System.out.println("Advertencia: Videojuego con datos incompletos en el carrito " + carritoId + ". Saltando este videojuego.");
+                    continue; // Omitir este videojuego
+                }
+
+                costeTotal += precio * cantidad;
+            }
+
+            // Agregar el resultado a la lista
+            resultados.add(new CarritoCoste(carritoId, usuarioId, costeTotal));
+        }
+
+        // Ordenar los resultados por el coste total de forma descendente
+        resultados.sort((c1, c2) -> Double.compare(c2.getCosteTotal(), c1.getCosteTotal()));
+
+        // Mostrar los resultados
+        System.out.println("Coste de cada carrito ordenado por el total de forma descendente:");
+        for (CarritoCoste resultado : resultados) {
+            System.out.println("Carrito ID: " + resultado.getCarritoId());
+            System.out.println("Usuario ID: " + resultado.getUsuarioId());
+            System.out.println("Coste Total: " + resultado.getCosteTotal());
+            System.out.println();
+        }
+    }
+
+    //Método para consultar gasto total de los usuarios
+    public void consultaTotalGastadoUsuarios() {
+        MongoCollection<Document> comprasCollection = database.getCollection("Compras");
+
+        // Obtener todas las compras
+        List<Document> compras = comprasCollection.find().into(new ArrayList<>());
+
+        // Mapa para almacenar el total gastado por cada usuario
+        Map<Integer, Double> totalGastadoPorUsuario = new HashMap<>();
+
+        // Calcular el total gastado por cada usuario
+        for (Document compra : compras) {
+            int usuarioId = compra.getInteger("usuario_id");
+            double totalCompra = compra.getDouble("total");
+
+            totalGastadoPorUsuario.put(usuarioId, totalGastadoPorUsuario.getOrDefault(usuarioId, 0.0) + totalCompra);
+        }
+
+        // Convertir el mapa a una lista de objetos UsuarioGasto
+        List<UsuarioGasto> resultados = totalGastadoPorUsuario.entrySet().stream()
+                .map(entry -> new UsuarioGasto(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        // Ordenar los resultados por el total gastado de forma ascendente
+        resultados.sort(Comparator.comparingDouble(UsuarioGasto::getTotalGastado));
+
+        // Mostrar los resultados
+        System.out.println("Total gastado por cada usuario ordenado por el total de forma ascendente:");
+        for (UsuarioGasto resultado : resultados) {
+            System.out.println("Usuario ID: " + resultado.getUsuarioId());
+            System.out.println("Total Gastado: " + resultado.getTotalGastado());
+            System.out.println();
+        }
     }
 
     //Método para introducir por teclado tipo string

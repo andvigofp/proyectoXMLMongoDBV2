@@ -84,14 +84,19 @@ public class AplicacionXMLMongoDB {
                     metodosMongoDB.anadirVideojuegoAlCarrito(teclado);
                     break;
                 case 14:
+                    metodosMongoDB.mostrarCarritoUsuario(teclado);
                     break;
                 case 15:
+                    metodosMongoDB.comprarCarritoUsuario(teclado);
                     break;
                 case 16:
+                    metodosMongoDB.mostrarComprasUsuario(teclado);
                     break;
                 case 17:
+                    metodosMongoDB.consultaCosteCarritos();
                     break;
                 case 18:
+                    metodosMongoDB.consultaTotalGastadoUsuarios();
                     break;
                 case 0:
                     System.out.println("Saliendo del programa.");

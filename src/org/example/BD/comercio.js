@@ -42,7 +42,7 @@ db.Usuarios.insertMany([
         "correo": "luis.martinez@example.com",
         "contrasena": "hashed_password5",
         "direccion": "Gran Vía 100, Ciudad, País",
-        "telefono": "777-888-9999".
+        "telefono": "777-888-9999",
         "edad": 30
     }
 ]);
@@ -154,7 +154,7 @@ db.Compras.insertMany([
                 "precio": 59.99
             }
         ],
-        "fecha_compra": "2025-03-10T14:48:00.000Z",
+        "fecha_compra": new Date("2025-03-10T14:48:00.000Z"),
         "total": 59.99
     },
     {
@@ -168,7 +168,7 @@ db.Compras.insertMany([
                 "precio": 69.99
             }
         ],
-        "fecha_compra": "2025-03-11T09:15:00.000Z",
+        "fecha_compra": new Date("2025-03-11T09:15:00.000Z"),
         "total": 69.99
     },
     {
@@ -188,7 +188,7 @@ db.Compras.insertMany([
                 "precio": 59.99
             }
         ],
-        "fecha_compra": "2025-03-12T16:30:00.000Z",
+        "fecha_compra": new Date("2025-03-12T16:30:00.000Z"),
         "total": 109.98
     },
     {
@@ -202,7 +202,7 @@ db.Compras.insertMany([
                 "precio": 39.99
             }
         ],
-        "fecha_compra": "2025-03-13T10:00:00.000Z",
+        "fecha_compra": new Date("2025-03-13T10:00:00.000Z"),
         "total": 39.99
     },
     {
@@ -222,7 +222,7 @@ db.Compras.insertMany([
                 "precio": 5.99
             }
         ],
-        "fecha_compra": "2025-03-14T11:20:00.000Z",
+        "fecha_compra": new Date("2025-03-14T11:20:00.000Z"),
         "total": 35.98
     }
 ]);

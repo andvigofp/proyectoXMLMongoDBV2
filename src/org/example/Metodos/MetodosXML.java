@@ -5,48 +5,65 @@ import org.basex.examples.api.BaseXClient;
 import org.example.ConexionBaseX.ConexionBaseX;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class MetodosXML {
     private static ConexionBaseX conexionBasex = new ConexionBaseX();
 
     //Método para modifciar el titulo por id
     public void modificarElementoPorID(Scanner teclado) {
-        // Pedir al usuario el ID del videojuego a modificar
-        int id = introducirInt(teclado,"Introduce el ID del videojuego a modificar");
+        int id = -1; // Inicializamos con un valor inválido para que entre al ciclo
+        boolean idValido = false;
 
-        // Obtener la conexión activa desde conexionBasex()
+        // Obtener la conexión activa desde conexionBasex
         BaseXClient session = conexionBasex.conexionBaseX();
 
         if (session != null) {
             try {
-                // Primera consulta: Mostrar el estado actual del videojuego
+                // Ciclo para validar la existencia del ID y asegurar que sea un número
+                while (!idValido) {
+                    try {
+                        // Pedir al usuario el ID del videojuego a modificar
+                        id = introducirInt(teclado, "Introduce el ID del videojuego a modificar (solo números):");
+
+                        // Validar si el ID existe en la base de datos BaseX
+                        String consultaValidarID = """
+                            for $v in //videojuego[id='%d']
+                            return data($v/id)
+                        """.formatted(id);
+
+                        BaseXClient.Query validarQuery = session.query(consultaValidarID);
+
+                        if (validarQuery.more()) {
+                            idValido = true; // El ID es válido si se encuentra en la base de datos
+                            validarQuery.close();
+                        } else {
+                            System.out.println("No se encontró ningún videojuego con el ID especificado. Por favor, introduce un ID válido.");
+                            validarQuery.close();
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Error: Solo se permiten números. Intenta nuevamente.");
+                        teclado.nextLine(); // Limpiar el buffer del escáner
+                    }
+                }
+
+                // Mostrar el estado actual del videojuego
                 String consultaEstado = """
-                        for $v in //videojuego[id='%d']
-                        return string-join((
-                            "Título actual: ", data($v/titulo),
-                            "\nDescripción actual: ", data($v/descripcion),
-                            "\nPrecio actual: ", data($v/precio),
-                            "\nDisponibilidad actual: ", data($v/disponibilidad),
-                            "\nGénero actual: ", data($v/genero),
-                            "\nDesarrollador actual: ", data($v/desarrollador),
-                            "\nEdad mínima recomendada actual: ", data($v/edad_minima_recomendada),
-                            "\nPlataforma actual: ", data($v/plataforma)
-                        ), "")
-                    """.formatted(id);
+                    for $v in //videojuego[id='%d']
+                    return string-join((
+                        "Título actual: ", data($v/titulo),
+                        "\nDescripción actual: ", data($v/descripcion),
+                        "\nPrecio actual: ", data($v/precio),
+                        "\nDisponibilidad actual: ", data($v/disponibilidad),
+                        "\nGénero actual: ", data($v/genero),
+                        "\nDesarrollador actual: ", data($v/desarrollador),
+                        "\nEdad mínima recomendada actual: ", data($v/edad_minima_recomendada),
+                        "\nPlataforma actual: ", data($v/plataforma)
+                    ), "")
+                """.formatted(id);
 
                 BaseXClient.Query query = session.query(consultaEstado);
-
-                if (query.more()) {
-                    System.out.println("Estado actual del videojuego:\n" + query.next());
-                } else {
-                    System.out.println("No se encontró ningún videojuego con el ID especificado.");
-                    query.close();
-                    return; // Salir si no se encuentra el ID
-                }
+                System.out.println("Estado actual del videojuego:\n" + query.next());
                 query.close();
 
                 // Mostrar el menú para seleccionar el campo a modificar
@@ -60,42 +77,42 @@ public class MetodosXML {
                 System.out.println("7. Edad mínima recomendada");
                 System.out.println("8. Plataforma");
 
-                int opcion = introducirInt(teclado,"Introduce el número de la opción:");
+                int opcion = introducirInt(teclado, "Introduce el número de la opción:");
                 teclado.nextLine(); // Limpiar el buffer del escáner
 
                 String nuevoValor = null;
 
                 switch (opcion) {
                     case 1:
-                        nuevoValor = introducirString(teclado,"Introduce el nuevo valor para el título");
+                        nuevoValor = introducirString(teclado, "Introduce el nuevo valor para el título:");
                         modificarCampo(session, id, "titulo", nuevoValor);
                         break;
                     case 2:
-                        nuevoValor = introducirString(teclado,"Introduce el nuevo valor para la descripción");
+                        nuevoValor = introducirString(teclado, "Introduce el nuevo valor para la descripción:");
                         modificarCampo(session, id, "descripcion", nuevoValor);
                         break;
                     case 3:
-                        double nuevoPrecio = pedirDouble(teclado,"Introduce el nuevo valor del precio");
+                        double nuevoPrecio = pedirDouble(teclado, "Introduce el nuevo valor del precio:");
                         modificarCampo(session, id, "precio", String.valueOf(nuevoPrecio));
                         break;
                     case 4:
-                        int nuevaDisponibilidad = introducirInt(teclado,"Introduce el nuevo valor de disponibilidad");
+                        int nuevaDisponibilidad = introducirInt(teclado, "Introduce el nuevo valor de disponibilidad:");
                         modificarCampo(session, id, "disponibilidad", String.valueOf(nuevaDisponibilidad));
                         break;
                     case 5:
-                        nuevoValor = introducirString(teclado,"Introduce el nuevo valor para el género");
+                        nuevoValor = introducirString(teclado, "Introduce el nuevo valor para el género:");
                         modificarCampo(session, id, "genero", nuevoValor);
                         break;
                     case 6:
-                        nuevoValor = introducirString(teclado,"Introduce el nuevo valor para el desarrollador");
+                        nuevoValor = introducirString(teclado, "Introduce el nuevo valor para el desarrollador:");
                         modificarCampo(session, id, "desarrollador", nuevoValor);
                         break;
                     case 7:
-                        int nuevaEdadMinimaRecomendada = introducirInt(teclado,"Introduce el nuevo valor para la edad mínima recomendada");
+                        int nuevaEdadMinimaRecomendada = introducirInt(teclado, "Introduce el nuevo valor para la edad mínima recomendada:");
                         modificarCampo(session, id, "edad_minima_recomendada", String.valueOf(nuevaEdadMinimaRecomendada));
                         break;
                     case 8:
-                        nuevoValor = introducirString(teclado,"Introduce el nuevo valor para la plataforma");
+                        nuevoValor = introducirString(teclado, "Introduce el nuevo valor para la plataforma:");
                         modificarCampo(session, id, "plataforma", nuevoValor);
                         break;
                     default:
@@ -105,18 +122,18 @@ public class MetodosXML {
 
                 // Confirmar el cambio
                 String consultaConfirmar = """
-                        for $v in //videojuego[id='%d']
-                        return string-join((
-                            "Nuevo título: ", data($v/titulo),
-                            "\nNueva descripción: ", data($v/descripcion),
-                            "\nNuevo precio: ", data($v/precio),
-                            "\nNueva disponibilidad: ", data($v/disponibilidad),
-                            "\nNuevo género: ", data($v/genero),
-                            "\nNuevo desarrollador: ", data($v/desarrollador),
-                            "\nNueva edad mínima recomendada: ", data($v/edad_minima_recomendada),
-                            "\nNueva plataforma: ", data($v/plataforma)
-                        ), "")
-                    """.formatted(id);
+                    for $v in //videojuego[id='%d']
+                    return string-join((
+                        "Nuevo título: ", data($v/titulo),
+                        "\nNueva descripción: ", data($v/descripcion),
+                        "\nNuevo precio: ", data($v/precio),
+                        "\nNueva disponibilidad: ", data($v/disponibilidad),
+                        "\nNuevo género: ", data($v/genero),
+                        "\nNuevo desarrollador: ", data($v/desarrollador),
+                        "\nNueva edad mínima recomendada: ", data($v/edad_minima_recomendada),
+                        "\nNueva plataforma: ", data($v/plataforma)
+                    ), "")
+                """.formatted(id);
 
                 query = session.query(consultaConfirmar);
 
@@ -129,7 +146,6 @@ public class MetodosXML {
                 System.out.println("Error al modificar el elemento en la base de datos.");
                 e.printStackTrace();
             } finally {
-                // Cerrar la conexión
                 try {
                     session.close();
                 } catch (IOException e) {
@@ -168,44 +184,91 @@ public class MetodosXML {
 
     //Método para elminar el por id
     public void eliminarVideojuegoPorID(Scanner teclado) {
-        // Pedir al usuario el ID del videojuego a eliminar
-        String id = introducirString(teclado,"Introduce el ID del videojuego a eliminar");
+        int id = -1; // Inicializamos con un valor inválido para que entre al ciclo
+        boolean idValido = false;
 
-        // Obtener la conexión activa desde conexionBaseX()
+        // Obtener la conexión activa desde conexionBaseX
         BaseXClient session = conexionBasex.conexionBaseX();
 
         if (session != null) {
             try {
-                // Primera consulta: Mostrar el videojuego que se desea eliminar para confirmar
-                String consultaEstado = """
-                            for $v in //videojuego[id='%s']
-                            return concat("Videojuego encontrado: ", data($v/titulo))
+                // Ciclo para validar la existencia del ID y asegurar que sea un número
+                while (!idValido) {
+                    try {
+                        // Pedir al usuario el ID del videojuego a eliminar
+                        id = introducirInt(teclado, "Introduce el ID del videojuego a eliminar (solo números):");
+                        teclado.nextLine();
+
+                        // Validar si el ID existe en la base de datos BaseX
+                        String consultaValidarID = """
+                            for $v in //videojuego[id='%d']
+                            return data($v/id)
                         """.formatted(id);
 
-                BaseXClient.Query query = session.query(consultaEstado);
+                        BaseXClient.Query validarQuery = session.query(consultaValidarID);
 
-                if (query.more()) {
-                    System.out.println("Estado actual del videojuego:\n" + query.next());
-                } else {
-                    System.out.println("No se encontró ningún videojuego con el ID especificado.");
-                    query.close();
-                    return; // Salir si no se encuentra el ID
+                        if (validarQuery.more()) {
+                            idValido = true; // El ID es válido si se encuentra en la base de datos
+                            validarQuery.close();
+                        } else {
+                            System.out.println("No se encontró ningún videojuego con el ID especificado. Por favor, introduce un ID válido.");
+                            validarQuery.close();
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Error: Solo se permiten números. Intenta nuevamente.");
+                        teclado.nextLine(); // Limpiar el buffer del escáner
+                    }
                 }
+
+                // Mostrar el videojuego que se desea eliminar
+                String consultaEstado = """
+                    for $v in //videojuego[id='%d']
+                    return concat("Videojuego encontrado: ", data($v/titulo))
+                """.formatted(id);
+
+                BaseXClient.Query query = session.query(consultaEstado);
+                System.out.println("Estado actual del videojuego:\n" + query.next());
                 query.close();
+
+                // Confirmar la eliminación con el usuario
+                System.out.print("¿Estás seguro de que deseas eliminar este videojuego? (s/n): ");
+                String confirmacion = teclado.nextLine().trim().toLowerCase();
+                if (!confirmacion.equals("s")) {
+                    System.out.println("Operación cancelada.");
+                    return;
+                }
 
                 // Comando XQuery para eliminar el videojuego
                 String comandoEliminar = """
-                            for $v in //videojuego[id='%s']
-                            return delete node $v
-                        """.formatted(id);
+                    for $v in //videojuego[id='%d']
+                    return delete node $v
+                """.formatted(id);
 
                 // Ejecutar el comando
                 BaseXClient.Query queryEliminar = session.query(comandoEliminar);
                 while (queryEliminar.more()) {
-                    queryEliminar.next(); // Ejecutar eliminación
+                    queryEliminar.next(); // Ejecutar la eliminación
                 }
                 queryEliminar.close();
+
                 System.out.println("¡Videojuego eliminado correctamente!");
+
+                // Mostrar todos los videojuegos restantes para verificar
+                String consultaTodos = """
+                    for $v in //videojuego
+                    return string-join((
+                        "ID: ", data($v/id),
+                        " | Título: ", data($v/titulo),
+                        " | Precio: ", data($v/precio)
+                    ), "\n")
+                """;
+
+                BaseXClient.Query queryTodos = session.query(consultaTodos);
+                System.out.println("\nEstado actual de todos los videojuegos en la base de datos:");
+                while (queryTodos.more()) {
+                    System.out.println(queryTodos.next());
+                }
+                queryTodos.close();
 
             } catch (IOException e) {
                 System.out.println("Error al eliminar el videojuego de la base de datos.");
@@ -223,6 +286,7 @@ public class MetodosXML {
             System.out.println("Error: No se pudo establecer la conexión con la base de datos.");
         }
     }
+
 
 
     //Listar  todos los videojuegos ordenados por plataforma y en segundo lugar por título

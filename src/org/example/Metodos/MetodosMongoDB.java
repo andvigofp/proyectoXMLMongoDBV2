@@ -231,19 +231,24 @@ public class MetodosMongoDB {
         }
     }
 
-
-
+    //Método para obtener el ultimo id del usuario
     private static int obtenerUltimoUsuarioId() {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
         Document ultimoUsuario = usuariosCollection.find().sort(Sorts.descending("usuario_id")).first();
         return (ultimoUsuario != null) ? ultimoUsuario.getInteger("usuario_id") : 0;
     }
 
-
+    //Método para obtener
     private static int obtenerUltimoCarritoId() {
         MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
         Document ultimoCarrito = carritoCollection.find().sort(Sorts.descending("carrito_id")).first();
         return (ultimoCarrito != null) ? ultimoCarrito.getInteger("carrito_id") : 0;
+    }
+
+    private static int obtenerUltimoCompraId() {
+        MongoCollection<Document> carritoCollection = database.getCollection("Compras");
+        Document ultimoCarrito = carritoCollection.find().sort(Sorts.descending("compra_id")).first();
+        return (ultimoCarrito != null) ? ultimoCarrito.getInteger("compra_id") : 0;
     }
 
     public int obtenerEdadUsuario(ObjectId usuarioId) {
@@ -283,7 +288,7 @@ public class MetodosMongoDB {
 
                 Integer edadUsuario = usuario.getInteger("edad");
 
-                // Consulta en BaseX para obtener videojuegos disponibles
+                // Consulta en BaseX
                 String consulta = String.format("""
                 for $v in //videojuego
                 where number($v/edad_minima_recomendada) <= %d
@@ -319,8 +324,10 @@ public class MetodosMongoDB {
 
                 // Permitir al usuario seleccionar videojuegos
                 while (true) {
-                    int idVideojuego = introducirInt(teclado, "Introduce el ID del videojuego que deseas añadir al carrito: ");
-                    int cantidad = introducirInt(teclado,"Introduce la cantidad que deseas añadir al carrito: ");
+                    System.out.print("Introduce el ID del videojuego que deseas añadir al carrito: ");
+                    int idVideojuego = teclado.nextInt();
+                    System.out.print("Introduce la cantidad que deseas añadir al carrito: ");
+                    int cantidad = teclado.nextInt();
                     teclado.nextLine(); // Limpiar el buffer del escáner
 
                     // Validar el ID
@@ -352,17 +359,30 @@ public class MetodosMongoDB {
 
                 // Procesar los videojuegos seleccionados al finalizar
                 if (!videojuegosSeleccionados.isEmpty()) {
-                    // Determinar el último carrito_id
-                    Document ultimoCarrito = carritoCollection.find().sort(Sorts.descending("carrito_id")).first();
-                    int nuevoCarritoId = (ultimoCarrito != null) ? ultimoCarrito.getInteger("carrito_id") + 1 : 1;
+                    Document carritoExistente = carritoCollection.find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
 
-                    // Crear un nuevo carrito
-                    Document nuevoCarrito = new Document("carrito_id", nuevoCarritoId)
-                            .append("usuario_id", usuarioIdIntegerActual)
-                            .append("videojuegos", videojuegosSeleccionados);
+                    if (carritoExistente != null) {
+                        // Añadir los videojuegos al carrito existente
+                        List<Document> videojuegos = carritoExistente.getList("videojuegos", Document.class, new ArrayList<>());
+                        videojuegos.addAll(videojuegosSeleccionados);
 
-                    carritoCollection.insertOne(nuevoCarrito);
-                    System.out.println("Nuevo carrito creado con carrito_id: " + nuevoCarritoId);
+                        carritoCollection.updateOne(
+                                Filters.eq("usuario_id", usuarioIdIntegerActual),
+                                new Document("$set", new Document("videojuegos", videojuegos))
+                        );
+                        System.out.println("Videojuegos añadidos al carrito existente.");
+                    } else {
+                        // Crear un nuevo carrito si no existe
+                        Document ultimoCarrito = carritoCollection.find().sort(Sorts.descending("carrito_id")).first();
+                        int nuevoCarritoId = (ultimoCarrito != null) ? ultimoCarrito.getInteger("carrito_id") + 1 : 1;
+
+                        Document nuevoCarrito = new Document("carrito_id", nuevoCarritoId)
+                                .append("usuario_id", usuarioIdIntegerActual)
+                                .append("videojuegos", videojuegosSeleccionados);
+
+                        carritoCollection.insertOne(nuevoCarrito);
+                        System.out.println("Nuevo carrito creado y videojuegos añadidos.");
+                    }
                 } else {
                     System.out.println("No se añadieron videojuegos al carrito.");
                 }
@@ -389,7 +409,6 @@ public class MetodosMongoDB {
             System.out.println("Error: No se pudo establecer la conexión con BaseX.");
         }
     }
-
 
 
     public void mostrarTodosLosUsuarios() {
@@ -663,7 +682,7 @@ public class MetodosMongoDB {
 
         if (confirmacion.equals("s")) {
             // Generar un nuevo ID de compra
-            int nuevaCompraId = obtenerUltimoCarritoId() + 1;
+            int nuevaCompraId = obtenerUltimoCompraId() + 1;
 
             // Crear un documento de compra
             Document compra = new Document("compra_id", nuevaCompraId)

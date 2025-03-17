@@ -63,7 +63,7 @@ public class AplicacionXMLMongoDB {
                         metodosXML.listarVideojuegosOrdenados();
                         break;
                     case 4:
-                        metodosXML.videojuegosPorEdad();
+                        metodosXML.videojuegosPorEdad(teclado);
                         break;
                     case 5:
                         metodosXML.videojuegoMasBaratoPorPlataforma();

@@ -338,9 +338,9 @@ public class MetodosXML {
 
 
     //Método para mostrar los videojuegos por edad mínima recomendada, ordenada por edad menor a mayor
-   public void videojuegosPorEdad() {
+   public void videojuegosPorEdad(Scanner teclado) {
         // Edad máxima predefinida
-        int edadMaxima = 6;
+        int edadMaxima = introducirInt(teclado,"Introduce la edad minima recomendada del videojuego");
 
         // Obtener la conexión activa desde conexionBaseX()
         BaseXClient session = conexionBasex.conexionBaseX();

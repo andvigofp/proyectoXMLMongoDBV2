@@ -48,14 +48,10 @@ public class MetodosMongoDB {
                 return;
             }
 
-            System.out.print("Introduce la contraseña del usuario: ");
-            String contrasena = teclado.nextLine();
-            System.out.print("Introduce la dirección del usuario: ");
-            String direccion = teclado.nextLine();
-            System.out.print("Introduce el teléfono del usuario: ");
-            String telefono = teclado.nextLine();
-            System.out.print("Introduce la edad del usuario: ");
-            int edad = teclado.nextInt();
+            String contrasena = introducirString(teclado,"Introduce la contraseña del usuario");
+            String direccion = introducirString(teclado,"Introduce la dirección del usuario: ");
+            String telefono = introducirString(teclado, "Introduce el teléfono del usuario: ");
+            int edad = introducirInt(teclado,"Introduce la edad del usuario:");
 
             // Encontrar el último usuario_id y asignar el siguiente usuario_id
             Document ultimoUsuario = usuariosCollection.find().sort(Sorts.descending("usuario_id")).first();
@@ -93,8 +89,7 @@ public class MetodosMongoDB {
     //Método para identificarUsarioPorEmail
     public void identificarUsuarioPorEmail(Scanner teclado) {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
-        System.out.print("Introduce el correo del usuario: ");
-        String correo = teclado.nextLine();
+        String correo = introducirString(teclado,"Introduce el correo del usuario:");
 
         try {
             Document usuario = usuariosCollection.find(Filters.eq("correo", correo)).first();
@@ -135,8 +130,7 @@ public class MetodosMongoDB {
                 System.out.println("Usuario encontrado: " + usuario.toJson());
 
                 // Confirmación antes de borrar
-                System.out.print("¿Estás seguro de que deseas borrar este usuario y sus datos asociados? (s/n): ");
-                String respuesta = teclado.nextLine();
+                String respuesta = introducirString(teclado, "¿Estás seguro de que deseas borrar este usuario y sus datos asociados? (s/n): ");
                 if (!respuesta.equalsIgnoreCase("s")) {
                     System.out.println("Operación cancelada.");
                     return;
@@ -325,10 +319,8 @@ public class MetodosMongoDB {
 
                 // Permitir al usuario seleccionar videojuegos
                 while (true) {
-                    System.out.print("Introduce el ID del videojuego que deseas añadir al carrito: ");
-                    int idVideojuego = teclado.nextInt();
-                    System.out.print("Introduce la cantidad que deseas añadir al carrito: ");
-                    int cantidad = teclado.nextInt();
+                    int idVideojuego = introducirInt(teclado, "Introduce el ID del videojuego que deseas añadir al carrito: ");
+                    int cantidad = introducirInt(teclado,"Introduce la cantidad que deseas añadir al carrito: ");
                     teclado.nextLine(); // Limpiar el buffer del escáner
 
                     // Validar el ID
@@ -406,7 +398,6 @@ public class MetodosMongoDB {
             System.out.println(usuario.toJson());
         }
     }
-
 
     public void mostrarVideojuegosPorEdad(Scanner teclado) {
         if (usuarioIdIntegerActual == null) {

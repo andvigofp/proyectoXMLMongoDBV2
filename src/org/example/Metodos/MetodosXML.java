@@ -390,9 +390,9 @@ public class MetodosXML {
     }
 
     //Método para buscar por una subcadena
-    public void buscarVideojuegosPorDescripcion() {
-        // Definir una subcadena fija para buscar en la descripción
-        String subcadena = "aventura"; // Cambia esta subcadena según tus necesidades
+    public void buscarVideojuegosPorDescripcion(Scanner teclado) {
+        // Definir una subcadena fija para buscar en la descripción por ejemplo (aventura, épica)
+        String subcadena = introducirString(teclado,"Introduce una subacadena cuya descripcion");
 
         // Obtener la conexión activa desde conexionBasex
         BaseXClient session = conexionBasex.conexionBaseX();

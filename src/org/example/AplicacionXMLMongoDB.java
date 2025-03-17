@@ -69,7 +69,7 @@ public class AplicacionXMLMongoDB {
                         metodosXML.videojuegoMasBaratoPorPlataforma();
                         break;
                     case 6:
-                        metodosXML.buscarVideojuegosPorDescripcion();
+                        metodosXML.buscarVideojuegosPorDescripcion(teclado);
                         break;
                     case 7:
                         metodosXML.cantidadYPorcentajePorPlataforma();

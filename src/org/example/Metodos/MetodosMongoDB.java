@@ -289,7 +289,7 @@ public class MetodosMongoDB {
 
                 Integer edadUsuario = usuario.getInteger("edad");
 
-                // Consulta en BaseX
+                // Consulta en BaseX para obtener videojuegos disponibles
                 String consulta = String.format("""
                 for $v in //videojuego
                 where number($v/edad_minima_recomendada) <= %d
@@ -373,6 +373,13 @@ public class MetodosMongoDB {
                     System.out.println("Nuevo carrito creado con carrito_id: " + nuevoCarritoId);
                 } else {
                     System.out.println("No se añadieron videojuegos al carrito.");
+                }
+
+                // Mostrar videojuegos directamente desde BaseX después de añadirlos
+                System.out.println("\nVideojuegos disponibles en BaseX después de añadir al carrito:");
+                for (Videojuego v : videojuegosDisponibles) {
+                    System.out.printf("ID: %d | Título: %s | Precio: %.2f%n",
+                            v.getId(), v.getTitulo(), v.getPrecio());
                 }
 
             } catch (IOException e) {

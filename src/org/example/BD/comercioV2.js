@@ -24,7 +24,8 @@ async function run() {
                 "correo": "juan.perez@example.com",
                 "contrasena": "hashed_password1",
                 "direccion": "Calle Falsa 123, Ciudad, País",
-                "telefono": "123-456-7890"
+                "telefono": "123-456-7890",
+                "edad": 15
             },
             {
                 "usuario_id": 2,
@@ -32,7 +33,8 @@ async function run() {
                 "correo": "maria.garcia@example.com",
                 "contrasena": "hashed_password2",
                 "direccion": "Avenida Siempre Viva 742, Ciudad, País",
-                "telefono": "098-765-4321"
+                "telefono": "098-765-4321",
+                "edad": 20
             },
             {
                 "usuario_id": 3,
@@ -40,7 +42,8 @@ async function run() {
                 "correo": "carlos.lopez@example.com",
                 "contrasena": "hashed_password3",
                 "direccion": "Plaza Mayor 1, Ciudad, País",
-                "telefono": "111-222-3333"
+                "telefono": "111-222-3333",
+                "edad": 18
             },
             {
                 "usuario_id": 4,
@@ -48,7 +51,8 @@ async function run() {
                 "correo": "ana.fernandez@example.com",
                 "contrasena": "hashed_password4",
                 "direccion": "Calle del Pez 23, Ciudad, País",
-                "telefono": "444-555-6666"
+                "telefono": "444-555-6666",
+                "edad": 25
             },
             {
                 "usuario_id": 5,
@@ -56,7 +60,8 @@ async function run() {
                 "correo": "luis.martinez@example.com",
                 "contrasena": "hashed_password5",
                 "direccion": "Gran Vía 100, Ciudad, País",
-                "telefono": "777-888-9999"
+                "telefono": "777-888-9999",
+                "edad": 30
             }
         ];
         await usuariosCollection.insertMany(usuarios);
@@ -70,13 +75,13 @@ async function run() {
                 "usuario_id": 1,
                 "videojuegos": [
                     {
-                        "videojuego_id": 101,
+                        "videojuego_id": 1,
                         "titulo": "The Legend of Zelda: Breath of the Wild",
                         "cantidad": 1,
                         "precio": 59.99
                     },
                     {
-                        "videojuego_id": 102,
+                        "videojuego_id": 11,
                         "titulo": "Super Mario Odyssey",
                         "cantidad": 2,
                         "precio": 49.99
@@ -88,13 +93,13 @@ async function run() {
                 "usuario_id": 2,
                 "videojuegos": [
                     {
-                        "videojuego_id": 103,
+                        "videojuego_id": 2,
                         "titulo": "God of War",
                         "cantidad": 1,
                         "precio": 69.99
                     },
                     {
-                        "videojuego_id": 104,
+                        "videojuego_id": 7,
                         "titulo": "Red Dead Redemption 2",
                         "cantidad": 1,
                         "precio": 39.99
@@ -106,13 +111,13 @@ async function run() {
                 "usuario_id": 3,
                 "videojuegos": [
                     {
-                        "videojuego_id": 105,
+                        "videojuego_id": 3,
                         "titulo": "Cyberpunk 2077",
                         "cantidad": 1,
                         "precio": 49.99
                     },
                     {
-                        "videojuego_id": 106,
+                        "videojuego_id": 9,
                         "titulo": "Animal Crossing: New Horizons",
                         "cantidad": 3,
                         "precio": 59.99
@@ -124,13 +129,13 @@ async function run() {
                 "usuario_id": 4,
                 "videojuegos": [
                     {
-                        "videojuego_id": 107,
+                        "videojuego_id": 4,
                         "titulo": "The Witcher 3: Wild Hunt",
                         "cantidad": 1,
                         "precio": 39.99
                     },
                     {
-                        "videojuego_id": 108,
+                        "videojuego_id": 5,
                         "titulo": "Persona 5 Royal",
                         "cantidad": 2,
                         "precio": 59.99
@@ -142,13 +147,13 @@ async function run() {
                 "usuario_id": 5,
                 "videojuegos": [
                     {
-                        "videojuego_id": 109,
+                        "videojuego_id": 6,
                         "titulo": "Minecraft",
                         "cantidad": 4,
                         "precio": 29.99
                     },
                     {
-                        "videojuego_id": 110,
+                        "videojuego_id": 8,
                         "titulo": "Among Us",
                         "cantidad": 5,
                         "precio": 5.99
@@ -167,7 +172,7 @@ async function run() {
                 "usuario_id": 1,
                 "videojuegos": [
                     {
-                        "videojuego_id": 101,
+                        "videojuego_id": 1,
                         "titulo": "The Legend of Zelda: Breath of the Wild",
                         "cantidad": 1,
                         "precio": 59.99
@@ -181,7 +186,7 @@ async function run() {
                 "usuario_id": 2,
                 "videojuegos": [
                     {
-                        "videojuego_id": 103,
+                        "videojuego_id": 2,
                         "titulo": "God of War",
                         "cantidad": 1,
                         "precio": 69.99
@@ -195,13 +200,13 @@ async function run() {
                 "usuario_id": 3,
                 "videojuegos": [
                     {
-                        "videojuego_id": 105,
+                        "videojuego_id": 3,
                         "titulo": "Cyberpunk 2077",
                         "cantidad": 1,
                         "precio": 49.99
                     },
                     {
-                        "videojuego_id": 106,
+                        "videojuego_id": 9,
                         "titulo": "Animal Crossing: New Horizons",
                         "cantidad": 1,
                         "precio": 59.99
@@ -215,7 +220,7 @@ async function run() {
                 "usuario_id": 4,
                 "videojuegos": [
                     {
-                        "videojuego_id": 107,
+                        "videojuego_id": 4,
                         "titulo": "The Witcher 3: Wild Hunt",
                         "cantidad": 1,
                         "precio": 39.99
@@ -229,13 +234,13 @@ async function run() {
                 "usuario_id": 5,
                 "videojuegos": [
                     {
-                        "videojuego_id": 109,
+                        "videojuego_id": 6,
                         "titulo": "Minecraft",
                         "cantidad": 1,
                         "precio": 29.99
                     },
                     {
-                        "videojuego_id": 110,
+                        "videojuego_id": 8,
                         "titulo": "Among Us",
                         "cantidad": 1,
                         "precio": 5.99

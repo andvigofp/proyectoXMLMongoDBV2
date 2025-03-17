@@ -13,6 +13,7 @@ import org.example.ConexionMongoDB.ConexionMongoDB;
 import org.example.Modelo.CarritoCoste;
 import org.example.Modelo.UsuarioGasto;
 import org.example.Modelo.Videojuego;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -266,46 +267,130 @@ public class MetodosMongoDB {
 
     //Método para ñadir videojuegos al carrito
     public void anadirVideojuegoAlCarrito(Scanner teclado) {
-        // Si el usuario no está identificado, intentar identificarlo
         if (usuarioIdIntegerActual == null) {
             identificarUsuarioPorEmail(teclado);
             if (usuarioIdIntegerActual == null) {
                 System.out.println("Error: No se ha identificado ningún usuario. No se puede proceder.");
-                return; // Si el usuario sigue sin identificarse, salir del método
+                return;
             }
         }
 
         MongoCollection<Document> carritoCollection = database.getCollection("Carrito");
 
-        while (true) {
-            mostrarVideojuegosPorEdad(teclado);
-
-            System.out.print("Introduce el ID del videojuego a añadir al carrito: ");
-            int idVideojuego = teclado.nextInt();
-            System.out.print("Introduce la cantidad a añadir al carrito: ");
-            int cantidad = teclado.nextInt();
-            teclado.nextLine(); // Limpiar el buffer
-
+        BaseXClient session = conexionBasex.conexionBaseX();
+        if (session != null) {
             try {
-                Document nuevoItemCarrito = new Document("usuario_id", usuarioIdIntegerActual)
-                        .append("videojuego_id", idVideojuego)
-                        .append("cantidad", cantidad);
+                Document usuario = database.getCollection("Usuarios")
+                        .find(Filters.eq("usuario_id", usuarioIdIntegerActual)).first();
+                if (usuario == null) {
+                    System.out.println("Error: Usuario no encontrado en MongoDB.");
+                    return;
+                }
 
-                carritoCollection.insertOne(nuevoItemCarrito);
-                System.out.println("Videojuego añadido al carrito exitosamente.");
+                Integer edadUsuario = usuario.getInteger("edad");
 
-            } catch (Exception e) {
-                System.out.println("Error al añadir el videojuego al carrito: " + e.getMessage());
+                // Consulta en BaseX
+                String consulta = String.format("""
+                for $v in //videojuego
+                where number($v/edad_minima_recomendada) <= %d
+                return <videojuego>
+                           <id>{data($v/id)}</id>
+                           <titulo>{data($v/titulo)}</titulo>
+                           <precio>{data($v/precio)}</precio>
+                       </videojuego>
+            """, edadUsuario);
+
+                BaseXClient.Query query = session.query(consulta);
+                List<Videojuego> videojuegosDisponibles = new ArrayList<>();
+
+                System.out.println("Videojuegos disponibles para tu edad:");
+                while (query.more()) {
+                    String resultado = query.next();
+                    Videojuego videojuego = parsearVideojuego(resultado);
+                    if (videojuego != null) {
+                        videojuegosDisponibles.add(videojuego);
+                        System.out.printf("ID: %d | Título: %s | Precio: %.2f%n",
+                                videojuego.getId(), videojuego.getTitulo(), videojuego.getPrecio());
+                    }
+                }
+                query.close();
+
+                if (videojuegosDisponibles.isEmpty()) {
+                    System.out.println("No hay videojuegos disponibles para tu edad.");
+                    return;
+                }
+
+                // Lista temporal para almacenar videojuegos seleccionados
+                List<Document> videojuegosSeleccionados = new ArrayList<>();
+
+                // Permitir al usuario seleccionar videojuegos
+                while (true) {
+                    System.out.print("Introduce el ID del videojuego que deseas añadir al carrito: ");
+                    int idVideojuego = teclado.nextInt();
+                    System.out.print("Introduce la cantidad que deseas añadir al carrito: ");
+                    int cantidad = teclado.nextInt();
+                    teclado.nextLine(); // Limpiar el buffer del escáner
+
+                    // Validar el ID
+                    Videojuego videojuegoSeleccionado = null;
+                    for (Videojuego v : videojuegosDisponibles) {
+                        if (v.getId() == idVideojuego) {
+                            videojuegoSeleccionado = v;
+                            break;
+                        }
+                    }
+
+                    if (videojuegoSeleccionado == null) {
+                        System.out.println("El ID ingresado no corresponde a un videojuego disponible. Inténtalo nuevamente.");
+                        continue;
+                    }
+
+                    // Añadir el videojuego a la lista temporal
+                    videojuegosSeleccionados.add(new Document("videojuego_id", idVideojuego)
+                            .append("titulo", videojuegoSeleccionado.getTitulo())
+                            .append("precio", videojuegoSeleccionado.getPrecio())
+                            .append("cantidad", cantidad));
+
+                    System.out.print("¿Deseas seguir añadiendo videojuegos al carrito? (s/n): ");
+                    String respuesta = teclado.nextLine();
+                    if (!respuesta.equalsIgnoreCase("s")) {
+                        break;
+                    }
+                }
+
+                // Procesar los videojuegos seleccionados al finalizar
+                if (!videojuegosSeleccionados.isEmpty()) {
+                    // Determinar el último carrito_id
+                    Document ultimoCarrito = carritoCollection.find().sort(Sorts.descending("carrito_id")).first();
+                    int nuevoCarritoId = (ultimoCarrito != null) ? ultimoCarrito.getInteger("carrito_id") + 1 : 1;
+
+                    // Crear un nuevo carrito
+                    Document nuevoCarrito = new Document("carrito_id", nuevoCarritoId)
+                            .append("usuario_id", usuarioIdIntegerActual)
+                            .append("videojuegos", videojuegosSeleccionados);
+
+                    carritoCollection.insertOne(nuevoCarrito);
+                    System.out.println("Nuevo carrito creado con carrito_id: " + nuevoCarritoId);
+                } else {
+                    System.out.println("No se añadieron videojuegos al carrito.");
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error al consultar videojuegos o añadir al carrito: " + e.getMessage());
                 e.printStackTrace();
+            } finally {
+                try {
+                    session.close();
+                } catch (IOException e) {
+                    System.out.println("Error al cerrar la conexión con BaseX.");
+                    e.printStackTrace();
+                }
             }
-
-            System.out.print("¿Deseas seguir añadiendo videojuegos al carrito? (s/n): ");
-            String respuesta = teclado.nextLine();
-            if (!respuesta.equalsIgnoreCase("s")) {
-                break;
-            }
+        } else {
+            System.out.println("Error: No se pudo establecer la conexión con BaseX.");
         }
     }
+
 
 
     public void mostrarTodosLosUsuarios() {
@@ -418,32 +503,57 @@ public class MetodosMongoDB {
         return videojuegosDisponibles;
     }
 
+    private static String getNodeValue(org.w3c.dom.Document document, String tagName) {
+        Node node = document.getElementsByTagName(tagName).item(0);
+        return (node != null) ? node.getTextContent() : null;
+    }
+
 
     // Método para parsear el resultado de la consulta y convertirlo en un objeto Videojuego
     private static Videojuego parsearVideojuego(String resultado) {
         try {
+            // Preparar el documento XML desde el string
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(resultado));
             org.w3c.dom.Document doc = builder.parse(is);
 
-            int id = Integer.parseInt(doc.getElementsByTagName("id").item(0).getTextContent());
-            String titulo = doc.getElementsByTagName("titulo").item(0).getTextContent();
-            String descripcion = doc.getElementsByTagName("descripcion").item(0).getTextContent();
-            double precio = Double.parseDouble(doc.getElementsByTagName("precio").item(0).getTextContent());
-            int disponibilidad = Integer.parseInt(doc.getElementsByTagName("disponibilidad").item(0).getTextContent());
-            String genero = doc.getElementsByTagName("genero").item(0).getTextContent();
-            String desarrollador = doc.getElementsByTagName("desarrollador").item(0).getTextContent();
-            int edadMinimaRecomendada = Integer.parseInt(doc.getElementsByTagName("edad_minima_recomendada").item(0).getTextContent());
-            String plataforma = doc.getElementsByTagName("plataforma").item(0).getTextContent();
+            // Obtener valores del documento XML
+            String idStr = getNodeValue(doc, "id");
+            String titulo = getNodeValue(doc, "titulo");
+            String descripcion = getNodeValue(doc, "descripcion");
+            String precioStr = getNodeValue(doc, "precio");
+            String disponibilidadStr = getNodeValue(doc, "disponibilidad");
+            String genero = getNodeValue(doc, "genero");
+            String desarrollador = getNodeValue(doc, "desarrollador");
+            String edadMinimaStr = getNodeValue(doc, "edad_minima_recomendada");
+            String plataforma = getNodeValue(doc, "plataforma");
 
-            return new Videojuego(id, titulo, descripcion, precio, disponibilidad, genero, desarrollador, edadMinimaRecomendada, plataforma);
+            // Validar y convertir valores
+            if (idStr == null || titulo == null || precioStr == null) {
+                System.out.println("Error: Nodos esenciales (id, titulo o precio) están ausentes.");
+                return null;
+            }
+
+            int id = Integer.parseInt(idStr);
+            double precio = Double.parseDouble(precioStr);
+            int disponibilidad = (disponibilidadStr != null) ? Integer.parseInt(disponibilidadStr) : 0;
+            int edadMinima = (edadMinimaStr != null) ? Integer.parseInt(edadMinimaStr) : 0;
+
+            // Crear y devolver el objeto Videojuego
+            return new Videojuego(id, titulo, descripcion != null ? descripcion : "", precio, disponibilidad,
+                    genero != null ? genero : "", desarrollador != null ? desarrollador : "", edadMinima,
+                    plataforma != null ? plataforma : "");
+
         } catch (Exception e) {
             System.out.println("Error al parsear el videojuego: " + e.getMessage());
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
+
+
+
 
     //Método para mostrar el carrito y coste total
     public void mostrarCarritoUsuario(Scanner teclado) {

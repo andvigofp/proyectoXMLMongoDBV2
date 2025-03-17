@@ -22,4 +22,17 @@ public class ConexionBaseX {
         }
         return null;
     }
+
+    public static void cerrarConexion(BaseXClient sesion) {
+        if (sesion != null) {
+            try {
+                sesion.close();
+                System.out.println("Conexión BaseX cerrada correctamente.");
+            } catch (IOException e) {
+                System.out.println("Error al cerrar la conexión con BaseX");
+                e.printStackTrace();
+            }
+        }
+    }
 }
+

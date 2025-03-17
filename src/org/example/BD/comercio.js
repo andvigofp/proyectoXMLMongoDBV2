@@ -54,13 +54,13 @@ db.Carrito.insertMany([
         "usuario_id": 1,
         "videojuegos": [
             {
-                "videojuego_id": 101,
+                "videojuego_id": 1, // Ajustado para coincidir con BaseX
                 "titulo": "The Legend of Zelda: Breath of the Wild",
                 "cantidad": 1,
                 "precio": 59.99
             },
             {
-                "videojuego_id": 102,
+                "videojuego_id": 11, // Ajustado para coincidir con BaseX
                 "titulo": "Super Mario Odyssey",
                 "cantidad": 2,
                 "precio": 49.99
@@ -72,13 +72,13 @@ db.Carrito.insertMany([
         "usuario_id": 2,
         "videojuegos": [
             {
-                "videojuego_id": 103,
+                "videojuego_id": 2, // Ajustado para coincidir con BaseX
                 "titulo": "God of War",
                 "cantidad": 1,
                 "precio": 69.99
             },
             {
-                "videojuego_id": 104,
+                "videojuego_id": 7, // Ajustado para coincidir con BaseX
                 "titulo": "Red Dead Redemption 2",
                 "cantidad": 1,
                 "precio": 39.99
@@ -90,16 +90,16 @@ db.Carrito.insertMany([
         "usuario_id": 3,
         "videojuegos": [
             {
-                "videojuego_id": 105,
+                "videojuego_id": 3, // Ajustado para coincidir con BaseX
                 "titulo": "Cyberpunk 2077",
                 "cantidad": 1,
                 "precio": 49.99
             },
             {
-                "videojuego_id": 106,
-                "titulo": "Animal Crossing: New Horizons",
+                "videojuego_id": 9, // Ajustado para coincidir con BaseX
+                "titulo": "Minecraft",
                 "cantidad": 3,
-                "precio": 59.99
+                "precio": 29.99
             }
         ]
     },
@@ -108,16 +108,16 @@ db.Carrito.insertMany([
         "usuario_id": 4,
         "videojuegos": [
             {
-                "videojuego_id": 107,
-                "titulo": "The Witcher 3: Wild Hunt",
+                "videojuego_id": 4, // Ajustado para coincidir con BaseX
+                "titulo": "EA Sports FC 25",
                 "cantidad": 1,
-                "precio": 39.99
+                "precio": 69.99
             },
             {
-                "videojuego_id": 108,
-                "titulo": "Persona 5 Royal",
+                "videojuego_id": 5, // Ajustado para coincidir con BaseX
+                "titulo": "Hollow Knight",
                 "cantidad": 2,
-                "precio": 59.99
+                "precio": 14.99
             }
         ]
     },
@@ -126,16 +126,16 @@ db.Carrito.insertMany([
         "usuario_id": 5,
         "videojuegos": [
             {
-                "videojuego_id": 109,
-                "titulo": "Minecraft",
+                "videojuego_id": 6, // Ajustado para coincidir con BaseX
+                "titulo": "Spider-Man 2",
                 "cantidad": 4,
-                "precio": 29.99
+                "precio": 79.99
             },
             {
-                "videojuego_id": 110,
-                "titulo": "Among Us",
+                "videojuego_id": 8, // Ajustado para coincidir con BaseX
+                "titulo": "Elden Ring",
                 "cantidad": 5,
-                "precio": 5.99
+                "precio": 59.99
             }
         ]
     }
@@ -148,7 +148,7 @@ db.Compras.insertMany([
         "usuario_id": 1,
         "videojuegos": [
             {
-                "videojuego_id": 101,
+                "videojuego_id": 1, // Ajustado para coincidir con BaseX
                 "titulo": "The Legend of Zelda: Breath of the Wild",
                 "cantidad": 1,
                 "precio": 59.99
@@ -162,7 +162,7 @@ db.Compras.insertMany([
         "usuario_id": 2,
         "videojuegos": [
             {
-                "videojuego_id": 103,
+                "videojuego_id": 2, // Ajustado para coincidir con BaseX
                 "titulo": "God of War",
                 "cantidad": 1,
                 "precio": 69.99
@@ -176,53 +176,53 @@ db.Compras.insertMany([
         "usuario_id": 3,
         "videojuegos": [
             {
-                "videojuego_id": 105,
+                "videojuego_id": 3, // Ajustado para coincidir con BaseX
                 "titulo": "Cyberpunk 2077",
                 "cantidad": 1,
                 "precio": 49.99
             },
             {
-                "videojuego_id": 106,
-                "titulo": "Animal Crossing: New Horizons",
+                "videojuego_id": 9, // Ajustado para coincidir con BaseX
+                "titulo": "Minecraft",
                 "cantidad": 1,
-                "precio": 59.99
+                "precio": 29.99
             }
         ],
         "fecha_compra": new Date("2025-03-12T16:30:00.000Z"),
-        "total": 109.98
+        "total": 79.98
     },
     {
         "compra_id": 4,
         "usuario_id": 4,
         "videojuegos": [
             {
-                "videojuego_id": 107,
-                "titulo": "The Witcher 3: Wild Hunt",
+                "videojuego_id": 4, // Ajustado para coincidir con BaseX
+                "titulo": "EA Sports FC 25",
                 "cantidad": 1,
-                "precio": 39.99
+                "precio": 69.99
             }
         ],
         "fecha_compra": new Date("2025-03-13T10:00:00.000Z"),
-        "total": 39.99
+        "total": 69.99
     },
     {
         "compra_id": 5,
         "usuario_id": 5,
         "videojuegos": [
             {
-                "videojuego_id": 109,
-                "titulo": "Minecraft",
+                "videojuego_id": 6, // Ajustado para coincidir con BaseX
+                "titulo": "Spider-Man 2",
                 "cantidad": 1,
-                "precio": 29.99
+                "precio": 79.99
             },
             {
-                "videojuego_id": 110,
-                "titulo": "Among Us",
+                "videojuego_id": 8, // Ajustado para coincidir con BaseX
+                "titulo": "Elden Ring",
                 "cantidad": 1,
-                "precio": 5.99
+                "precio": 59.99
             }
         ],
         "fecha_compra": new Date("2025-03-14T11:20:00.000Z"),
-        "total": 35.98
+        "total": 139.98
     }
 ]);

@@ -89,7 +89,15 @@ public class MetodosMongoDB {
     //Método para identificarUsarioPorEmail
     public void identificarUsuarioPorEmail(Scanner teclado) {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
-        String correo = introducirString(teclado,"Introduce el correo del usuario:");
+
+        // Mostrar lista de correos disponibles en la colección "Usuarios"
+        System.out.println("Lista de correos registrados:");
+        for (Document usuario : usuariosCollection.find()) {
+            System.out.println("- " + usuario.getString("correo"));
+        }
+
+        // Solicitar correo al usuario
+        String correo = introducirString(teclado, "Introduce el correo del usuario:");
 
         try {
             Document usuario = usuariosCollection.find(Filters.eq("correo", correo)).first();
@@ -179,7 +187,7 @@ public class MetodosMongoDB {
         MongoCollection<Document> usuariosCollection = database.getCollection("Usuarios");
 
         // Pedir el campo a modificar y el nuevo valor
-        String campo = introducirString(teclado, "Introduce el campo a modificar (nombre, contrasena, direccion, telefono, edad): ");
+        String campo = introducirString(teclado, "Introduce el campo a modificar (nombre, correo, contrasena, direccion, telefono, edad): ");
         String nuevoValor = introducirString(teclado, "Introduce el nuevo valor para " + campo + ": ");
 
         try {

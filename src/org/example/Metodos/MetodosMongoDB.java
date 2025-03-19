@@ -149,7 +149,7 @@ public class MetodosMongoDB {
                 System.out.println("Usuario borrado de la colección Usuarios");
 
                 // Borrar el carrito asociado en la colección Carrito
-                carritoCollection.deleteMany(Filters.eq("usuario_id", usuarioIdIntegerActual));
+                carritoCollection.deleteOne(Filters.eq("usuario_id", usuarioIdIntegerActual));
                 System.out.println("Carritos asociados borrados de la colección Carrito");
 
                 // Borrar las compras asociadas en la colección Compras

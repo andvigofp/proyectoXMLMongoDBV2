@@ -296,7 +296,7 @@ public class MetodosMongoDB {
 
                 Integer edadUsuario = usuario.getInteger("edad");
 
-                // Consulta en BaseX
+                // Consulta en BaseX: también obtener la disponibilidad
                 String consulta = String.format("""
                 for $v in //videojuego
                 where number($v/edad_minima_recomendada) <= %d
@@ -304,6 +304,7 @@ public class MetodosMongoDB {
                            <id>{data($v/id)}</id>
                            <titulo>{data($v/titulo)}</titulo>
                            <precio>{data($v/precio)}</precio>
+                           <disponibilidad>{data($v/disponibilidad)}</disponibilidad>
                        </videojuego>
             """, edadUsuario);
 
@@ -316,8 +317,8 @@ public class MetodosMongoDB {
                     Videojuego videojuego = parsearVideojuego(resultado);
                     if (videojuego != null) {
                         videojuegosDisponibles.add(videojuego);
-                        System.out.printf("ID: %d | Título: %s | Precio: %.2f%n",
-                                videojuego.getId(), videojuego.getTitulo(), videojuego.getPrecio());
+                        System.out.printf("ID: %d | Título: %s | Precio: %.2f | Disponibilidad: %d%n",
+                                videojuego.getId(), videojuego.getTitulo(), videojuego.getPrecio(), videojuego.getDisponibilidad());
                     }
                 }
                 query.close();
@@ -338,7 +339,7 @@ public class MetodosMongoDB {
                     int cantidad = teclado.nextInt();
                     teclado.nextLine(); // Limpiar el buffer del escáner
 
-                    // Validar el ID
+                    // Validar el ID y obtener el videojuego correspondiente
                     Videojuego videojuegoSeleccionado = null;
                     for (Videojuego v : videojuegosDisponibles) {
                         if (v.getId() == idVideojuego) {
@@ -349,6 +350,12 @@ public class MetodosMongoDB {
 
                     if (videojuegoSeleccionado == null) {
                         System.out.println("El ID ingresado no corresponde a un videojuego disponible. Inténtalo nuevamente.");
+                        continue;
+                    }
+
+                    // Validar la cantidad contra la disponibilidad
+                    if (cantidad > videojuegoSeleccionado.getDisponibilidad()) {
+                        System.out.println("Cantidad excede la disponibilidad. Máximo disponible: " + videojuegoSeleccionado.getDisponibilidad());
                         continue;
                     }
 
@@ -395,12 +402,14 @@ public class MetodosMongoDB {
                     System.out.println("No se añadieron videojuegos al carrito.");
                 }
 
+
                 // Mostrar videojuegos directamente desde BaseX después de añadirlos
                 System.out.println("\nVideojuegos disponibles en BaseX después de añadir al carrito:");
                 for (Videojuego v : videojuegosDisponibles) {
-                    System.out.printf("ID: %d | Título: %s | Precio: %.2f%n",
-                            v.getId(), v.getTitulo(), v.getPrecio());
+                    System.out.printf("ID: %d | Título: %s | Precio: %.2f | Disponibilidad: %d%n",
+                            v.getId(), v.getTitulo(), v.getPrecio(), v.getDisponibilidad());
                 }
+
 
             } catch (IOException e) {
                 System.out.println("Error al consultar videojuegos o añadir al carrito: " + e.getMessage());
@@ -417,6 +426,7 @@ public class MetodosMongoDB {
             System.out.println("Error: No se pudo establecer la conexión con BaseX.");
         }
     }
+
 
 
     public void mostrarTodosLosUsuarios() {
